@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Map</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <style type="text/css">
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #map-canvas {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 90%;
+        }
+        #header {
+            height: 5%;
+            padding: 1% 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+        }
+        </style>
+        <script type="text/javascript">
+        // api key
+        var apiKey = 'AIzaSyA-Ht8eYaOc215iqBypHDcKoaoRdBAFEhM';
+        // gmap url
+        var url = 'https://maps.googleapis.com/maps/api/js';
+        // gmap
+        var map;
+        // map-canvas
+        var map_canvas;
+        // 緯度
+        var lat = '35.632049';
+        // 経度
+        var lng = '139.880848';
+        // 検索語
+        var query;
+        // 検索結果の場所
+        var searchedLatLng;
+        function loadGoogleMap() {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = url + '?' + 'v=3.exp&' + 'key=' + apiKey + '&'  + 'callback=initialize';
+            document.body.appendChild(script);
+        }
+        // callback関数
+        function initialize() {
+            // シンデレラ城の緯度経度
+            var latlng = new google.maps.LatLng(lat,lng);
+            var mapOptions = {
+                zoom: 18,
+                // シンデレラ城を中心の位置に配置
+                center: latlng,
+                // 地図を航空写真にする
+                mapTypeId: google.maps.MapTypeId.SATELLITE,                
+            };
+            // 地図の作成
+            map = new google.maps.Map(map_canvas,mapOptions);
+            // 45度の。。きで表示する
+            map.setTilt(45);
+        }
+        function getLocation(address) {
+            var geocoder = new google.maps.Geocoder();
+            // 検索ワードを渡してジオコーディングのAJAX処理を行う
+            geocoder.geocode({'address':address},function(results,status) {
+                // ジオコーディングが成功した場合
+                if (status == google.maps.GeocoderStatus.OK) {
+                    // 住所検索が成功した場合、位置情報を取得する
+                    searchedLatLng = results[0].geometry.location;
+                    // 取得した位置情報の場所を地図のセンターにする
+                    map.setCenter(searchedLatLng);
+                    // センターの位置にマーカを配置
+                    var marker = new google.maps.Marker({
+                        position: searchedLatLng,
+                        map: map
+                    });
+                } else {
+                    alert("。。する場所が見つかりません");
+                }
+            });
+        }
+
+        $(function() {
+            // map-canvasを事前に取得する
+            map_canvas = $('#map-canvas').get(0);
+            loadGoogleMap();
+            // クリックで地図の表示
+            $('#button').on('click',function() {
+                query = $('#keyword').val();
+                getLocation(query);
+            });
+        });
+        </script>
+    </head>
+    <body>
+        <div id="header">
+            <form>
+                <input type="text" id="keyword" value="東京都目黒区東山3‐15‐1" />
+                <input type="button" value="検索" id="btn" />
+            </form>
+        </div>
+        <div id="map-canvas"></div>
+    </body>
+</html>

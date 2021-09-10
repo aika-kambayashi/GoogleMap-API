@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Map</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <style type="text/css">
+        html, body, #map-canvas {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #button {
+            width: 100px;
+            text-align: center;
+            margin: 20px auto;
+            background-color: #000066;
+            color: #fff;
+            padding: 20px;
+            cursor: pointer;
+        }
+        </style>
+        <script type="text/javascript">
+        // api key
+        var apiKey = 'AIzaSyA-Ht8eYaOc215iqBypHDcKoaoRdBAFEhM';
+        // gmap url
+        var url = 'https://maps.googleapis.com/maps/api/js';
+        // map-canvas
+        var map_canvas;
+        // 緯度
+        var lat = '35.681382';
+        // 経度
+        var lng = '139.766084';
+        // InfoWindowのコンテンツ
+        var content = "<div>ここにいるよ</div>";
+        // callback関数
+        function initialize() {
+            var latlng = new google.maps.LatLng(lat,lng);
+            var mapOptions = {
+                zoom: 18,
+                center: latlng,                    
+            };
+            // 地図の作成
+            var map = new google.maps.Map(map_canvas,mapOptions);
+            // 情報ウィンドウを作成
+            var infowindow = new google.maps.InfoWindow ({map: map});
+            if (navigator.geolocation) {
+                // ブラウザがgeolocationをサポートしている（現在地の情報を取得できる）
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    // 現在地の緯度経度を設定
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    // 情報ウィンドウの位置を現在地に設定する
+                    infowindow.setPosition(pos);
+                    // 情報ウィンドウのコンテンツを設定する
+                    infowindow.setContent(content);
+                    // 地図の中心を現在地に設定する
+                    map.setCenter(pos);
+                }, function() {
+                    // 現在地の情報を取得できない場合のエラー処理関数
+                    handleLocationError(true, infowindow, map.getCenter());
+                });
+            } else {
+                // ブラウザがgeolocationをサポートしていない場合のエラー処理関数
+                handleLocationError(false, infowindow, map.getCenter());
+            }
+        }
+        function loadGoogleMap() {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = url + '?' + 'v=3.exp&' + 'key=' + apiKey + '&'  + 'callback=initialize';
+            document.body.appendChild(script);
+        }
+        $(function() {
+            // map-canvasを事前に取得する
+            map_canvas = $('#map-canvas').get(0);
+            loadGoogleMap();
+        });
+        </script>
+    </head>
+    <body>
+        <div id="map-canvas"></div>
+    </body>
+</html>
